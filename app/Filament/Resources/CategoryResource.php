@@ -77,7 +77,7 @@ class CategoryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('image')
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('image')
                     ->collection('image')
                     ->circular()
                     ->size(40),

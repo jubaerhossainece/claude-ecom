@@ -25,6 +25,18 @@ php artisan view:clear
 tail -f storage/logs/laravel.log    # Watch errors (OTP codes logged here in dev)
 ```
 
+## Docker
+
+Containerized stack: `app` (PHP 8.4-FPM), `nginx` (port 8000), `mysql` (port 3307 on host to avoid clashing with any native MySQL). Node/npm run on the host, not in a container — `npm run dev`/`npm run build` still apply as above.
+
+```bash
+docker compose up -d --build   # Build and start app, nginx, mysql
+docker compose exec app php artisan migrate:fresh --seed
+docker compose exec app php artisan <command>   # Any artisan command
+docker compose logs -f app     # Tail app container logs
+docker compose down            # Stop stack (add -v to also drop the mysql volume)
+```
+
 ## Credentials
 
 | Access | URL | Login |

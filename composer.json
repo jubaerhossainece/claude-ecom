@@ -6,8 +6,9 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.3",
+        "php": "^8.4",
         "filament/filament": "^3.3",
+        "filament/spatie-laravel-media-library-plugin": "^3.3",
         "http-interop/http-factory-guzzle": "^1.2",
         "laravel/framework": "^13.8",
         "laravel/scout": "^11.2",
