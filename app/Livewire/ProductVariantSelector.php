@@ -50,6 +50,16 @@ class ProductVariantSelector extends Component
             : null;
     }
 
+    public function increment(): void
+    {
+        $this->quantity++;
+    }
+
+    public function decrement(): void
+    {
+        $this->quantity = max(1, $this->quantity - 1);
+    }
+
     public function addToCart(CartService $cartService): void
     {
         $variantId = $this->selectedVariantId;

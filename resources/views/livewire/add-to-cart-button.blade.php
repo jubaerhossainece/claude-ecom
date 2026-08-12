@@ -1,8 +1,8 @@
 <div class="flex items-center gap-2">
     <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden">
-        <button wire:click="$set('quantity', Math.max(1, quantity - 1))" class="px-2 py-1 text-gray-600 hover:bg-gray-100">−</button>
+        <button wire:click="decrement" class="px-2 py-1 text-gray-600 hover:bg-gray-100">−</button>
         <span class="px-3 py-1 text-sm font-medium border-x border-gray-300">{{ $quantity }}</span>
-        <button wire:click="$set('quantity', quantity + 1)" class="px-2 py-1 text-gray-600 hover:bg-gray-100">+</button>
+        <button wire:click="increment" class="px-2 py-1 text-gray-600 hover:bg-gray-100">+</button>
     </div>
 
     <button wire:click="addToCart"

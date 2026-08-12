@@ -12,6 +12,16 @@ class AddToCartButton extends Component
     public int $quantity = 1;
     public bool $added = false;
 
+    public function increment(): void
+    {
+        $this->quantity++;
+    }
+
+    public function decrement(): void
+    {
+        $this->quantity = max(1, $this->quantity - 1);
+    }
+
     public function addToCart(CartService $cartService): void
     {
         if (! $this->product->is_in_stock) {
