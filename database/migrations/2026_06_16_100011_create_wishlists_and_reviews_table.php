@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('customer_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->foreignId('variant_id')->nullable()->constrained('product_variants')->nullOnDelete();
+            $table->decimal('price_at_added', 12, 2)->nullable();
             $table->timestamps();
             $table->unique(['customer_id', 'product_id', 'variant_id']);
         });

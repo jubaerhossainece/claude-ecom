@@ -65,7 +65,7 @@
             @endif
 
             {{-- Price --}}
-            <div class="bg-gray-50 rounded-xl p-4 mb-6">
+            <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6">
                 <div class="flex items-center gap-3">
                     <span class="text-3xl font-bold text-primary">
                         {{ $symbol }}{{ number_format($product->effective_price, 0) }}
@@ -95,7 +95,7 @@
             @endif
 
             {{-- Delivery info --}}
-            <div class="mt-6 border rounded-xl p-4 space-y-2 text-sm text-gray-600">
+            <div class="mt-6 border border-gray-200 rounded-xl p-4 space-y-2 text-sm text-gray-600">
                 <div class="flex gap-3 items-start">
                     <span class="text-lg">🚚</span>
                     <div>
@@ -130,7 +130,7 @@
 
     {{-- Tabs: Description / Attributes / Reviews --}}
     <div class="mt-12" x-data="{ tab: 'description' }">
-        <div class="border-b flex gap-6">
+        <div class="border-b border-gray-200 flex gap-6">
             @foreach(['description' => 'Description', 'attributes' => 'Specifications', 'reviews' => 'Reviews (' . $reviews->count() . ')'] as $key => $label)
                 <button @click="tab = '{{ $key }}'"
                         :class="tab === '{{ $key }}' ? 'border-b-2 border-primary text-primary' : 'text-gray-500'"
@@ -146,7 +146,7 @@
             @if($product->attributeValues->isNotEmpty())
                 <table class="w-full text-sm">
                     @foreach($product->attributeValues as $attrVal)
-                        <tr class="border-b">
+                        <tr class="border-b border-gray-100">
                             <td class="py-3 pr-6 font-medium text-gray-600 w-1/3">{{ $attrVal->attribute->name }}</td>
                             <td class="py-3 text-gray-800">{{ $attrVal->display_value }}</td>
                         </tr>
@@ -158,8 +158,54 @@
         </div>
 
         <div x-show="tab === 'reviews'" class="py-6">
+            @if($myReview)
+                <div class="bg-gray-50 rounded-xl border border-gray-200 p-4 mb-6">
+                    <p class="text-sm font-medium text-gray-700 mb-2">
+                        Your review {{ $myReview->is_approved ? '' : '(awaiting approval)' }}
+                    </p>
+                    <form action="{{ route('reviews.update', $myReview) }}" method="POST" enctype="multipart/form-data" class="space-y-2">
+                        @csrf @method('PUT')
+                        <div class="flex gap-1 text-lg" x-data="{ rating: {{ $myReview->rating }} }">
+                            <template x-for="i in 5" :key="i">
+                                <button type="button" @click="rating = i" :class="i <= rating ? 'text-yellow-400' : 'text-gray-300'">★</button>
+                            </template>
+                            <input type="hidden" name="rating" x-model="rating">
+                        </div>
+                        <input type="text" name="title" value="{{ $myReview->title }}" placeholder="Title (optional)" class="w-full rounded-lg border-gray-300 text-sm">
+                        <textarea name="body" rows="2" placeholder="Your review" class="w-full rounded-lg border-gray-300 text-sm">{{ $myReview->body }}</textarea>
+                        <input type="file" name="photos[]" multiple accept="image/*" class="text-xs">
+                        <div class="flex gap-3">
+                            <button type="submit" class="text-xs font-medium bg-primary text-white rounded-lg px-3 py-1.5">Update Review</button>
+                        </div>
+                    </form>
+                    <form action="{{ route('reviews.destroy', $myReview) }}" method="POST" class="mt-2">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="text-xs text-red-500 hover:underline">Delete review</button>
+                    </form>
+                </div>
+            @elseif($canReview)
+                <div class="bg-gray-50 rounded-xl border border-gray-200 p-4 mb-6" x-data="{ rating: 5 }">
+                    <p class="text-sm font-medium text-gray-700 mb-2">Write a review</p>
+                    <form action="{{ route('reviews.store', $product) }}" method="POST" enctype="multipart/form-data" class="space-y-2">
+                        @csrf
+                        <div class="flex gap-1 text-lg">
+                            <template x-for="i in 5" :key="i">
+                                <button type="button" @click="rating = i" :class="i <= rating ? 'text-yellow-400' : 'text-gray-300'">★</button>
+                            </template>
+                            <input type="hidden" name="rating" x-model="rating">
+                        </div>
+                        <input type="text" name="title" placeholder="Title (optional)" class="w-full rounded-lg border-gray-300 text-sm">
+                        <textarea name="body" rows="2" placeholder="Your review" class="w-full rounded-lg border-gray-300 text-sm"></textarea>
+                        <input type="file" name="photos[]" multiple accept="image/*" class="text-xs">
+                        <button type="submit" class="text-xs font-medium bg-primary text-white rounded-lg px-3 py-1.5">Submit Review</button>
+                    </form>
+                </div>
+            @elseif(auth('customer')->check())
+                <p class="text-xs text-gray-400 mb-6">You can review this product after it's delivered to you.</p>
+            @endif
+
             @forelse($reviews as $review)
-                <div class="border-b pb-4 mb-4">
+                <div class="border-b border-gray-100 pb-4 mb-4">
                     <div class="flex items-center gap-3 mb-2">
                         <div class="flex text-yellow-400">
                             @for($i = 1; $i <= 5; $i++)
@@ -171,6 +217,15 @@
                     </div>
                     @if($review->title) <p class="font-medium text-gray-800 text-sm">{{ $review->title }}</p> @endif
                     @if($review->body) <p class="text-gray-600 text-sm mt-1">{{ $review->body }}</p> @endif
+                    @if($review->getMedia('photos')->isNotEmpty())
+                        <div class="flex gap-2 mt-2">
+                            @foreach($review->getMedia('photos') as $photo)
+                                <a href="{{ $photo->getUrl() }}" target="_blank">
+                                    <img src="{{ $photo->getUrl() }}" class="w-14 h-14 object-cover rounded-lg border border-gray-200">
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             @empty
                 <p class="text-gray-500 text-sm">No reviews yet. Be the first!</p>

@@ -2,7 +2,16 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\CustomerAcquisitionChartWidget;
+use App\Filament\Widgets\OperationsOverviewWidget;
+use App\Filament\Widgets\OrderStatusChartWidget;
+use App\Filament\Widgets\PaymentMethodChartWidget;
+use App\Filament\Widgets\RecentCustomersWidget;
+use App\Filament\Widgets\RecentOrdersWidget;
+use App\Filament\Widgets\RevenueByCategoryChartWidget;
+use App\Filament\Widgets\SalesChartWidget;
 use App\Filament\Widgets\SalesOverviewWidget;
+use App\Filament\Widgets\TopSellingProductsWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -41,6 +50,15 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 Widgets\AccountWidget::class,
                 SalesOverviewWidget::class,
+                OperationsOverviewWidget::class,
+                SalesChartWidget::class,
+                OrderStatusChartWidget::class,
+                PaymentMethodChartWidget::class,
+                RevenueByCategoryChartWidget::class,
+                CustomerAcquisitionChartWidget::class,
+                RecentOrdersWidget::class,
+                TopSellingProductsWidget::class,
+                RecentCustomersWidget::class,
             ])
             ->navigationGroups([
                 'Catalog',

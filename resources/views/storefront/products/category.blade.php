@@ -20,8 +20,8 @@
         {{-- Sidebar Filters --}}
         @if($filterableAttributes->isNotEmpty())
         <aside class="md:w-56 flex-shrink-0">
-            <div class="bg-white rounded-xl border p-4">
-                <h3 class="font-bold text-gray-800 mb-4">Filter</h3>
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+                <h3 class="font-bold text-gray-800 mb-4 pb-3 border-b border-gray-100">Filter</h3>
                 <form method="GET">
                     @foreach($filterableAttributes as $attr)
                         <div class="mb-4">
@@ -55,7 +55,7 @@
                     {{ $category->name }}
                     <span class="text-sm font-normal text-gray-500">({{ $products->total() }} products)</span>
                 </h1>
-                <select onchange="location.href=this.value" class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none">
+                <select onchange="location.href=this.value" class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10">
                     @foreach(['newest' => 'Newest First', 'price_asc' => 'Price: Low to High', 'price_desc' => 'Price: High to Low', 'popular' => 'Most Popular'] as $val => $label)
                         <option value="{{ request()->fullUrlWithQuery(['sort' => $val]) }}" {{ $sort === $val ? 'selected' : '' }}>{{ $label }}</option>
                     @endforeach
@@ -67,7 +67,7 @@
                 <div class="flex gap-3 flex-wrap mb-5">
                     @foreach($subcategories as $sub)
                         <a href="{{ route('products.category', $sub) }}"
-                           class="text-sm border rounded-full px-4 py-1.5 hover:border-primary hover:text-primary text-gray-600 transition-colors">
+                           class="text-sm border border-gray-200 bg-white rounded-full px-4 py-1.5 hover:border-primary hover:text-primary text-gray-600 transition-colors">
                             {{ $sub->name }} <span class="text-gray-400">({{ $sub->products_count }})</span>
                         </a>
                     @endforeach

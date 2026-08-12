@@ -39,6 +39,8 @@ class StoreSettings extends Page
             'delivery_inside_dhaka' => $store->getSetting('delivery_inside_dhaka', 60),
             'delivery_outside_dhaka' => $store->getSetting('delivery_outside_dhaka', 120),
             'free_delivery_above' => $store->getSetting('free_delivery_above', 0),
+            'tax_enabled' => (bool) $store->getSetting('tax_enabled', false),
+            'tax_rate_percent' => $store->getSetting('tax_rate_percent', 0),
             'meta_title' => $store->getSetting('meta_title'),
             'meta_description' => $store->getSetting('meta_description'),
         ];
@@ -100,6 +102,19 @@ class StoreSettings extends Page
                                 ->numeric(),
                         ])->columns(2),
 
+                    Forms\Components\Tabs\Tab::make('Tax')
+                        ->schema([
+                            Forms\Components\Toggle::make('tax_enabled')
+                                ->label('Charge tax on orders')
+                                ->live(),
+                            Forms\Components\TextInput::make('tax_rate_percent')
+                                ->label('Tax rate (%)')
+                                ->numeric()
+                                ->minValue(0)
+                                ->maxValue(100)
+                                ->visible(fn (Forms\Get $get) => $get('tax_enabled')),
+                        ])->columns(2),
+
                     Forms\Components\Tabs\Tab::make('SEO')
                         ->schema([
                             Forms\Components\TextInput::make('meta_title')->columnSpanFull(),
@@ -123,7 +138,7 @@ class StoreSettings extends Page
 
         $stringSettings = ['support_phone', 'support_email', 'currency', 'currency_symbol', 'primary_color', 'default_language', 'cod_confirmation_message', 'meta_title', 'meta_description'];
         $boolSettings = ['payment_cod_enabled', 'payment_sslcommerz_enabled', 'payment_bkash_enabled', 'cod_confirmation_required'];
-        $intSettings = ['delivery_inside_dhaka', 'delivery_outside_dhaka', 'free_delivery_above'];
+        $intSettings = ['delivery_inside_dhaka', 'delivery_outside_dhaka', 'free_delivery_above', 'tax_rate_percent'];
 
         foreach ($stringSettings as $key) {
             $store->setSetting($key, $data[$key] ?? '', 'string', $this->getGroup($key));
@@ -132,8 +147,10 @@ class StoreSettings extends Page
             $store->setSetting($key, $data[$key] ? '1' : '0', 'boolean', 'payment');
         }
         foreach ($intSettings as $key) {
-            $store->setSetting($key, (string) ($data[$key] ?? 0), 'integer', 'delivery');
+            $store->setSetting($key, (string) ($data[$key] ?? 0), 'integer', $this->getGroup($key));
         }
+
+        $store->setSetting('tax_enabled', $data['tax_enabled'] ? '1' : '0', 'boolean', 'tax');
 
         Notification::make()->title('Settings saved')->success()->send();
     }
@@ -143,6 +160,7 @@ class StoreSettings extends Page
         return match (true) {
             str_starts_with($key, 'payment_') || str_starts_with($key, 'cod_') => 'payment',
             str_starts_with($key, 'delivery_') || str_starts_with($key, 'free_') => 'delivery',
+            str_starts_with($key, 'tax_') => 'tax',
             in_array($key, ['meta_title', 'meta_description']) => 'seo',
             in_array($key, ['primary_color', 'theme']) => 'appearance',
             default => 'general',

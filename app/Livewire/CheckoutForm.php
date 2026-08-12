@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Exceptions\InsufficientStockException;
 use App\Models\Coupon;
 use App\Models\DeliveryZone;
 use App\Models\District;
@@ -138,8 +139,8 @@ class CheckoutForm extends Component
         $cart = $cartService->getOrCreateCart();
         $coupon = Coupon::where('code', strtoupper($this->coupon_code))->where('store_id', $store->id)->first();
 
-        if (! $coupon || ! $coupon->isValid($cart->subtotal)) {
-            $this->couponError = 'Invalid or expired coupon code.';
+        if (! $coupon || ! $coupon->isValid($cart->subtotal, auth('customer')->id())) {
+            $this->couponError = 'Invalid, expired, or already-used coupon code.';
             $this->discountAmount = 0;
             return;
         }
@@ -160,20 +161,25 @@ class CheckoutForm extends Component
 
         $customer = Auth::guard('customer')->user();
 
-        $order = $orderService->createFromCart($cart, [
-            'name' => $this->name,
-            'phone' => $this->phone,
-            'email' => $this->email ?: null,
-            'division_id' => $this->division_id,
-            'district_id' => $this->district_id,
-            'thana_id' => $this->thana_id,
-            'area' => $this->area,
-            'address_line' => $this->address_line,
-            'payment_method' => $this->payment_method,
-            'coupon_code' => $this->coupon_code,
-            'notes' => $this->notes,
-            'customer_id' => $customer?->id,
-        ]);
+        try {
+            $order = $orderService->createFromCart($cart, [
+                'name' => $this->name,
+                'phone' => $this->phone,
+                'email' => $this->email ?: null,
+                'division_id' => $this->division_id,
+                'district_id' => $this->district_id,
+                'thana_id' => $this->thana_id,
+                'area' => $this->area,
+                'address_line' => $this->address_line,
+                'payment_method' => $this->payment_method,
+                'coupon_code' => $this->coupon_code,
+                'notes' => $this->notes,
+                'customer_id' => $customer?->id,
+            ]);
+        } catch (InsufficientStockException $e) {
+            $this->addError('cart', $e->getMessage());
+            return;
+        }
 
         return redirect()->route('checkout.success', $order)->with('order_placed', true);
     }

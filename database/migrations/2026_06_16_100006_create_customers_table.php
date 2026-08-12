@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('password')->nullable();
             $table->boolean('is_active')->default(true);
             $table->json('meta')->nullable();
+            $table->text('admin_notes')->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->index(['store_id', 'phone']);

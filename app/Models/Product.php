@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Scout\Searchable;
@@ -16,9 +17,9 @@ class Product extends Model implements HasMedia
     use SoftDeletes, InteractsWithMedia, Searchable;
 
     protected $fillable = [
-        'store_id', 'category_id', 'name', 'slug', 'short_description', 'description',
+        'store_id', 'category_id', 'brand_id', 'name', 'slug', 'short_description', 'description',
         'status', 'is_featured', 'unit_of_sale', 'base_price', 'sale_price', 'cost_price',
-        'sku', 'barcode', 'stock_quantity', 'low_stock_threshold', 'track_inventory',
+        'sku', 'barcode', 'low_stock_threshold', 'track_inventory',
         'allow_backorder', 'weight', 'dimensions', 'sort_order', 'meta_title', 'meta_description', 'meta',
     ];
 
@@ -47,9 +48,24 @@ class Product extends Model implements HasMedia
         return $this->belongsTo(Category::class);
     }
 
+    public function brand(): BelongsTo
+    {
+        return $this->belongsTo(Brand::class);
+    }
+
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class, 'product_tag');
+    }
+
     public function variants(): HasMany
     {
         return $this->hasMany(ProductVariant::class)->orderBy('sort_order');
+    }
+
+    public function warehouseStocks(): HasMany
+    {
+        return $this->hasMany(WarehouseStock::class);
     }
 
     public function attributeValues(): HasMany
@@ -89,6 +105,39 @@ class Product extends Model implements HasMedia
     public function getIsOnSaleAttribute(): bool
     {
         return $this->sale_price !== null && $this->sale_price < $this->base_price;
+    }
+
+    public function getStockQuantityAttribute(): int
+    {
+        if ($this->variants()->exists()) {
+            $stocks = WarehouseStock::whereIn('variant_id', $this->variants()->pluck('id'))
+                ->selectRaw('SUM(quantity) as quantity, SUM(reserved_quantity) as reserved_quantity')
+                ->first();
+        } else {
+            $stocks = $this->warehouseStocks()->whereNull('variant_id')
+                ->selectRaw('SUM(quantity) as quantity, SUM(reserved_quantity) as reserved_quantity')
+                ->first();
+        }
+
+        return max(0, (int) $stocks->quantity - (int) $stocks->reserved_quantity);
+    }
+
+    public function getOnHandQuantityAttribute(): int
+    {
+        if ($this->variants()->exists()) {
+            return (int) WarehouseStock::whereIn('variant_id', $this->variants()->pluck('id'))->sum('quantity');
+        }
+
+        return (int) $this->warehouseStocks()->whereNull('variant_id')->sum('quantity');
+    }
+
+    public function getReservedQuantityAttribute(): int
+    {
+        if ($this->variants()->exists()) {
+            return (int) WarehouseStock::whereIn('variant_id', $this->variants()->pluck('id'))->sum('reserved_quantity');
+        }
+
+        return (int) $this->warehouseStocks()->whereNull('variant_id')->sum('reserved_quantity');
     }
 
     public function getIsInStockAttribute(): bool

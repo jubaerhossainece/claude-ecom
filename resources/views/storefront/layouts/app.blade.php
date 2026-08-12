@@ -48,22 +48,52 @@
             </a>
 
             {{-- Search --}}
-            <form action="{{ route('products.search') }}" method="GET" class="hidden md:flex flex-1 max-w-lg mx-6">
+            <form action="{{ route('products.search') }}" method="GET" class="hidden md:flex flex-1 max-w-lg mx-6"
+                  x-data="{
+                      q: '{{ request('q') }}',
+                      results: [],
+                      open: false,
+                      timer: null,
+                      search() {
+                          clearTimeout(this.timer);
+                          if (this.q.length < 2) { this.results = []; this.open = false; return; }
+                          this.timer = setTimeout(() => {
+                              fetch('{{ route('products.autocomplete') }}?q=' + encodeURIComponent(this.q))
+                                  .then(r => r.json())
+                                  .then(data => { this.results = data; this.open = data.length > 0; });
+                          }, 250);
+                      }
+                  }"
+                  @click.outside="open = false">
                 <div class="relative w-full">
-                    <input type="search" name="q" value="{{ request('q') }}"
-                           placeholder="Search products..."
-                           class="w-full border border-gray-300 rounded-full px-5 py-2 pr-12 text-sm focus:outline-none focus:border-primary">
+                    <input type="search" name="q" x-model="q" @input="search()" @focus="if (results.length) open = true"
+                           placeholder="Search products..." autocomplete="off"
+                           class="w-full border border-gray-300 rounded-full px-5 py-2 pr-12 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10">
                     <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-primary">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     </button>
+
+                    <div x-show="open" x-cloak class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-50">
+                        <template x-for="product in results" :key="product.url">
+                            <a :href="product.url" class="flex items-center gap-3 px-4 py-2 hover:bg-gray-50">
+                                <img :src="product.thumbnail" class="w-8 h-8 object-cover rounded">
+                                <span class="text-sm text-gray-700 flex-1" x-text="product.name"></span>
+                                <span class="text-xs text-gray-400" x-text="'৳' + product.price"></span>
+                            </a>
+                        </template>
+                    </div>
                 </div>
             </form>
 
             {{-- Nav icons --}}
             <div class="flex items-center gap-4">
                 @auth('customer')
-                    <a href="{{ route('account.index') }}" class="text-gray-600 hover:text-primary">
+                    <a href="{{ route('account.profile') }}" class="text-gray-600 hover:text-primary">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    </a>
+                    <a href="{{ route('account.notifications') }}" class="relative text-gray-600 hover:text-primary">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                        @livewire('notification-badge')
                     </a>
                     <a href="{{ route('account.wishlist') }}" class="text-gray-600 hover:text-primary">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
@@ -85,14 +115,14 @@
             <form action="{{ route('products.search') }}" method="GET">
                 <input type="search" name="q" value="{{ request('q') }}"
                        placeholder="Search products..."
-                       class="w-full border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none">
+                       class="w-full border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10">
             </form>
         </div>
     </div>
 </header>
 
 {{-- Category Nav --}}
-<nav class="bg-white border-b overflow-x-auto">
+<nav class="bg-white border-b border-gray-200 overflow-x-auto">
     <div class="max-w-7xl mx-auto px-4 sm:px-6">
         <div class="flex gap-6 py-2 whitespace-nowrap">
             @foreach(\App\Models\Category::where('store_id', $store->id ?? 0)->whereNull('parent_id')->active()->orderBy('sort_order')->limit(10)->get() as $navCat)

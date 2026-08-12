@@ -14,7 +14,8 @@ class Category extends Model implements HasMedia
     use InteractsWithMedia;
 
     protected $fillable = [
-        'store_id', 'parent_id', 'name', 'slug', 'description', 'sort_order', 'is_active', 'meta',
+        'store_id', 'parent_id', 'name', 'slug', 'description',
+        'meta_title', 'meta_description', 'sort_order', 'is_active', 'meta',
     ];
 
     protected $casts = [
@@ -53,6 +54,7 @@ class Category extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('image')->singleFile();
+        $this->addMediaCollection('banner')->singleFile();
     }
 
     public function getAncestors(): \Illuminate\Support\Collection

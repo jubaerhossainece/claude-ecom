@@ -5,7 +5,7 @@
 @php $symbol = $store?->getSetting('currency_symbol', '৳'); @endphp
 
 <div class="max-w-2xl mx-auto px-4 sm:px-6 py-16 text-center">
-    <div class="bg-white rounded-2xl shadow-sm border p-8">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
         <div class="text-6xl mb-4">🎉</div>
         <h1 class="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h1>
         <p class="text-gray-500 mb-6">Thank you for your order, {{ $order->customer_name }}!</p>

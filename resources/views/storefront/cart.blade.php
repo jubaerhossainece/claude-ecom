@@ -17,7 +17,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2 space-y-3">
                 @foreach($cart->items as $item)
-                    <div class="bg-white rounded-xl border p-4 flex gap-4 items-center">
+                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 flex gap-4 items-center">
                         <a href="{{ route('products.show', $item->product) }}">
                             <img src="{{ $item->product?->thumbnail_url }}" alt="{{ $item->product?->name }}"
                                  class="w-20 h-20 object-cover rounded-lg flex-shrink-0">
@@ -32,11 +32,11 @@
                             <p class="text-sm text-gray-500 mt-1">{{ $symbol }}{{ number_format($item->unit_price, 0) }} each</p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <form action="{{ route('cart.update', $item) }}" method="POST" class="flex items-center border rounded-lg overflow-hidden">
+                            <form action="{{ route('cart.update', $item) }}" method="POST" class="flex items-center border border-gray-300 rounded-lg overflow-hidden">
                                 @csrf @method('PATCH')
                                 <button type="submit" name="quantity" value="{{ max(1, $item->quantity - 1) }}"
                                         class="px-2 py-1 text-gray-600 hover:bg-gray-100">−</button>
-                                <span class="px-3 py-1 text-sm font-medium border-x">{{ $item->quantity }}</span>
+                                <span class="px-3 py-1 text-sm font-medium border-x border-gray-300">{{ $item->quantity }}</span>
                                 <button type="submit" name="quantity" value="{{ $item->quantity + 1 }}"
                                         class="px-2 py-1 text-gray-600 hover:bg-gray-100">+</button>
                             </form>
@@ -53,8 +53,8 @@
             </div>
 
             <div class="lg:col-span-1">
-                <div class="bg-white rounded-xl border p-6 sticky top-24">
-                    <h2 class="font-bold text-gray-800 mb-4">Summary</h2>
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 sticky top-24">
+                    <h2 class="font-bold text-gray-800 mb-4 pb-3 border-b border-gray-100">Summary</h2>
                     <div class="space-y-2 text-sm">
                         <div class="flex justify-between text-gray-600">
                             <span>Items ({{ $cart->total_items }})</span>
@@ -64,7 +64,7 @@
                             <span>Delivery</span>
                             <span class="text-xs text-gray-400">Calculated at checkout</span>
                         </div>
-                        <div class="flex justify-between font-bold text-gray-900 text-base border-t pt-2 mt-2">
+                        <div class="flex justify-between font-bold text-gray-900 text-base border-t border-gray-100 pt-2 mt-2">
                             <span>Subtotal</span>
                             <span class="text-primary">{{ $symbol }}{{ number_format($cart->subtotal, 0) }}</span>
                         </div>

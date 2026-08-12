@@ -54,6 +54,12 @@ class CategoryResource extends Resource
                         ->image()
                         ->imageEditor(),
 
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('banner')
+                        ->collection('banner')
+                        ->image()
+                        ->imageEditor()
+                        ->helperText('Wide hero image shown at the top of this category\'s page.'),
+
                     Forms\Components\TextInput::make('sort_order')
                         ->numeric()
                         ->default(0),
@@ -61,6 +67,14 @@ class CategoryResource extends Resource
                     Forms\Components\Toggle::make('is_active')
                         ->default(true),
                 ])->columns(2),
+
+            Forms\Components\Section::make('SEO')
+                ->schema([
+                    Forms\Components\TextInput::make('meta_title')
+                        ->maxLength(255),
+                    Forms\Components\Textarea::make('meta_description')
+                        ->rows(3),
+                ])->columns(1),
 
             Forms\Components\Section::make('Attributes for This Category')
                 ->description('Select which attributes products in this category should have.')
@@ -115,8 +129,6 @@ class CategoryResource extends Resource
     {
         return [
             'index' => Pages\ListCategories::route('/'),
-            'create' => Pages\CreateCategory::route('/create'),
-            'edit' => Pages\EditCategory::route('/{record}/edit'),
         ];
     }
 }

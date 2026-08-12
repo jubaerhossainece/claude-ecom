@@ -26,7 +26,6 @@ return new class extends Migration
             $table->decimal('cost_price', 12, 2)->nullable();
             $table->string('sku')->nullable();
             $table->string('barcode')->nullable();
-            $table->integer('stock_quantity')->default(0);
             $table->integer('low_stock_threshold')->default(5);
             $table->boolean('track_inventory')->default(true);
             $table->boolean('allow_backorder')->default(false);
@@ -59,11 +58,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->string('sku')->nullable();
+            $table->string('barcode')->nullable();
             $table->json('attribute_values');   // {attribute_slug: value, ...}
             $table->string('variant_label')->nullable(); // "Red / XL"
             $table->decimal('price', 12, 2)->nullable();      // override
             $table->decimal('sale_price', 12, 2)->nullable();
-            $table->integer('stock_quantity')->default(0);
+            $table->decimal('weight', 8, 3)->nullable(); // in kg, overrides product weight
             $table->boolean('is_active')->default(true);
             $table->integer('sort_order')->default(0);
             $table->timestamps();

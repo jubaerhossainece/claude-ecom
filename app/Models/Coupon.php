@@ -28,13 +28,22 @@ class Coupon extends Model
         return $this->belongsTo(Store::class);
     }
 
-    public function isValid(float $subtotal): bool
+    public function isValid(float $subtotal, ?int $customerId = null): bool
     {
         if (! $this->is_active) return false;
         if ($this->starts_at && now()->lt($this->starts_at)) return false;
         if ($this->expires_at && now()->gt($this->expires_at)) return false;
         if ($this->usage_limit && $this->used_count >= $this->usage_limit) return false;
         if ($this->min_order_amount && $subtotal < $this->min_order_amount) return false;
+
+        if ($this->usage_limit_per_customer && $customerId) {
+            $customerUses = Order::where('customer_id', $customerId)
+                ->where('coupon_id', $this->id)
+                ->count();
+
+            if ($customerUses >= $this->usage_limit_per_customer) return false;
+        }
+
         return true;
     }
 

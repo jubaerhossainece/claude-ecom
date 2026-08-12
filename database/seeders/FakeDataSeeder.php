@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Attribute;
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Customer;
 use App\Models\CustomerAddress;
@@ -15,6 +16,8 @@ use App\Models\ProductAttributeValue;
 use App\Models\ProductVariant;
 use App\Models\Review;
 use App\Models\Store;
+use App\Models\Tag;
+use App\Models\WarehouseStock;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -30,8 +33,12 @@ class FakeDataSeeder extends Seeder
         // ── 2. Categories ──────────────────────────────────────────────────
         $categories = $this->seedCategories($store, $attrs);
 
+        // ── 2b. Brands & Tags ─────────────────────────────────────────────
+        $brands = $this->seedBrands($store);
+        $tags = $this->seedTags($store);
+
         // ── 3. Products ────────────────────────────────────────────────────
-        $this->seedProducts($store, $categories, $attrs);
+        $this->seedProducts($store, $categories, $attrs, $brands, $tags);
 
         // ── 4. Customers ───────────────────────────────────────────────────
         $customers = $this->seedCustomers($store);
@@ -72,7 +79,6 @@ class FakeDataSeeder extends Seeder
                     ['label' => '2kg', 'value' => '2kg'],
                     ['label' => '5kg', 'value' => '5kg'],
                 ]],
-            ['name' => 'Brand', 'slug' => 'brand', 'type' => 'text', 'is_filterable' => true, 'is_variant' => false, 'options' => null],
             ['name' => 'Material', 'slug' => 'material', 'type' => 'text', 'is_filterable' => false, 'is_variant' => false, 'options' => null],
             ['name' => 'Warranty', 'slug' => 'warranty', 'type' => 'select', 'is_filterable' => false, 'is_variant' => false,
                 'options' => [
@@ -174,7 +180,43 @@ class FakeDataSeeder extends Seeder
     }
 
     // ────────────────────────────────────────────────────────────────────────
-    private function seedProducts(Store $store, array $categories, array $attrs): void
+    private function seedBrands(Store $store): array
+    {
+        $names = [
+            'FashionBD', 'DhakaStyle', 'DenimCo BD', 'Samsung', 'Xiaomi',
+            'SoundMax', 'PRAN', 'HomeChef BD', 'SleepWell BD',
+        ];
+
+        $created = [];
+        foreach ($names as $i => $name) {
+            $created[$name] = Brand::create([
+                'store_id' => $store->id,
+                'name' => $name,
+                'slug' => Str::slug($name),
+                'is_active' => true,
+                'sort_order' => $i,
+            ]);
+        }
+        return $created;
+    }
+
+    private function seedTags(Store $store): array
+    {
+        $names = ['New', 'Bestseller', 'Sale', 'Eco-Friendly', 'Limited Edition'];
+
+        $created = [];
+        foreach ($names as $name) {
+            $created[$name] = Tag::create([
+                'store_id' => $store->id,
+                'name' => $name,
+                'slug' => Str::slug($name),
+            ]);
+        }
+        return $created;
+    }
+
+    // ────────────────────────────────────────────────────────────────────────
+    private function seedProducts(Store $store, array $categories, array $attrs, array $brands, array $tags): void
     {
         $products = [
             // Clothing
@@ -288,12 +330,16 @@ class FakeDataSeeder extends Seeder
                 ]],
         ];
 
+        $warehouse = $store->defaultWarehouse();
+
         foreach ($products as $i => $def) {
             $cat = $categories[$def['cat']] ?? null;
+            $brand = isset($def['attrs']['brand']) ? ($brands[$def['attrs']['brand']] ?? null) : null;
 
             $product = Product::create([
                 'store_id' => $store->id,
                 'category_id' => $cat?->id,
+                'brand_id' => $brand?->id,
                 'name' => $def['name'],
                 'slug' => Str::slug($def['name']),
                 'short_description' => Str::limit($def['desc'], 120),
@@ -305,11 +351,23 @@ class FakeDataSeeder extends Seeder
                 'sale_price' => $def['sale'],
                 'cost_price' => round($def['price'] * 0.6),
                 'sku' => 'SKU-' . strtoupper(Str::random(6)),
-                'stock_quantity' => $def['stock'],
                 'low_stock_threshold' => 5,
                 'track_inventory' => true,
                 'sort_order' => $i,
             ]);
+
+            if (! empty($tags)) {
+                $product->tags()->attach(collect($tags)->random(rand(0, 2))->pluck('id'));
+            }
+
+            if ($warehouse && empty($def['variants'])) {
+                WarehouseStock::create([
+                    'warehouse_id' => $warehouse->id,
+                    'product_id' => $product->id,
+                    'variant_id' => null,
+                    'quantity' => $def['stock'],
+                ]);
+            }
 
             // Attribute values (non-variant)
             foreach ($def['attrs'] as $attrSlug => $value) {
@@ -327,16 +385,24 @@ class FakeDataSeeder extends Seeder
                 $attrValues = array_diff_key($varDef, array_flip(['stock', 'price']));
                 $label = implode(' / ', array_values($attrValues));
 
-                ProductVariant::create([
+                $variant = ProductVariant::create([
                     'product_id' => $product->id,
                     'sku' => 'VAR-' . strtoupper(Str::random(5)),
                     'attribute_values' => $attrValues,
                     'variant_label' => $label,
                     'price' => $varDef['price'],
-                    'stock_quantity' => $varDef['stock'],
                     'is_active' => true,
                     'sort_order' => $j,
                 ]);
+
+                if ($warehouse) {
+                    WarehouseStock::create([
+                        'warehouse_id' => $warehouse->id,
+                        'product_id' => $product->id,
+                        'variant_id' => $variant->id,
+                        'quantity' => $varDef['stock'],
+                    ]);
+                }
             }
 
             // Reviews (2-4 per product)

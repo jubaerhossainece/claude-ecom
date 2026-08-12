@@ -23,9 +23,19 @@ class OrderController extends Controller
         $customer = Auth::guard('customer')->user();
         abort_if($order->customer_id !== $customer->id, 403);
 
-        $order->load('items.product', 'statusHistories');
+        $order->load('items.product', 'items.returnRequests', 'statusHistories');
 
         return view('storefront.account.order-detail', compact('order'));
+    }
+
+    public function invoice(\App\Models\Order $order)
+    {
+        $customer = Auth::guard('customer')->user();
+        abort_if($order->customer_id !== $customer->id, 403);
+
+        $order->load('items', 'store');
+
+        return view('orders.invoice', compact('order'));
     }
 
     public function reorder(\App\Models\Order $order, CartService $cartService)

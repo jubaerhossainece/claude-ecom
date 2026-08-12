@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\DeliveryZone;
 use App\Models\District;
 use App\Models\Store;
+use App\Models\Warehouse;
 use Illuminate\Database\Seeder;
 
 class StoreSeeder extends Seeder
@@ -16,6 +17,13 @@ class StoreSeeder extends Seeder
             'slug' => 'my-store',
             'description' => 'Welcome to our online store.',
             'tagline' => 'Quality products at your doorstep',
+            'is_active' => true,
+        ]);
+
+        Warehouse::create([
+            'store_id' => $store->id,
+            'name' => 'Main Warehouse',
+            'is_default' => true,
             'is_active' => true,
         ]);
 
@@ -48,6 +56,10 @@ class StoreSeeder extends Seeder
             ['key' => 'delivery_inside_dhaka', 'value' => '60', 'type' => 'integer', 'group' => 'delivery'],
             ['key' => 'delivery_outside_dhaka', 'value' => '120', 'type' => 'integer', 'group' => 'delivery'],
             ['key' => 'free_delivery_above', 'value' => '0', 'type' => 'integer', 'group' => 'delivery'],
+
+            // Tax
+            ['key' => 'tax_enabled', 'value' => '0', 'type' => 'boolean', 'group' => 'tax'],
+            ['key' => 'tax_rate_percent', 'value' => '0', 'type' => 'integer', 'group' => 'tax'],
 
             // SEO
             ['key' => 'meta_title', 'value' => 'My Store - Quality Products Online', 'type' => 'string', 'group' => 'seo'],

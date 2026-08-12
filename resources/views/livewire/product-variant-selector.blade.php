@@ -43,9 +43,9 @@
 
     {{-- Quantity + Add to Cart --}}
     <div class="flex items-center gap-3">
-        <div class="flex items-center border rounded-lg overflow-hidden">
-            <button wire:click="$set('quantity', max(1, quantity - 1))" class="px-3 py-2 text-gray-600 hover:bg-gray-100">−</button>
-            <span class="px-4 py-2 text-sm font-medium border-x">{{ $quantity }}</span>
+        <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+            <button wire:click="$set('quantity', Math.max(1, quantity - 1))" class="px-3 py-2 text-gray-600 hover:bg-gray-100">−</button>
+            <span class="px-4 py-2 text-sm font-medium border-x border-gray-300">{{ $quantity }}</span>
             <button wire:click="$set('quantity', quantity + 1)" class="px-3 py-2 text-gray-600 hover:bg-gray-100">+</button>
         </div>
 

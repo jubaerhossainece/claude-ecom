@@ -7,17 +7,11 @@
 <div class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
     <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl font-bold text-gray-800">My Orders</h1>
-        <div class="flex gap-3">
-            <a href="{{ route('account.wishlist') }}" class="text-sm text-gray-500 hover:text-primary">Wishlist</a>
-            <form action="{{ route('customer.logout') }}" method="POST">
-                @csrf
-                <button type="submit" class="text-sm text-red-500 hover:text-red-700">Logout</button>
-            </form>
-        </div>
+        @include('storefront.account.partials.nav')
     </div>
 
     @forelse($orders as $order)
-        <div class="bg-white rounded-xl border p-5 mb-4">
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5 mb-4">
             <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
                 <div>
                     <span class="font-bold text-gray-800">{{ $order->order_number }}</span>

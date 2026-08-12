@@ -40,6 +40,21 @@ class Store extends Model implements HasMedia
         return $this->hasMany(Attribute::class);
     }
 
+    public function brands(): HasMany
+    {
+        return $this->hasMany(Brand::class);
+    }
+
+    public function tags(): HasMany
+    {
+        return $this->hasMany(Tag::class);
+    }
+
+    public function pageVisits(): HasMany
+    {
+        return $this->hasMany(PageVisit::class);
+    }
+
     public function deliveryZones(): HasMany
     {
         return $this->hasMany(DeliveryZone::class);
@@ -58,6 +73,16 @@ class Store extends Model implements HasMedia
     public function coupons(): HasMany
     {
         return $this->hasMany(Coupon::class);
+    }
+
+    public function warehouses(): HasMany
+    {
+        return $this->hasMany(Warehouse::class);
+    }
+
+    public function defaultWarehouse(): ?Warehouse
+    {
+        return $this->warehouses()->where('is_default', true)->first();
     }
 
     public function getSetting(string $key, mixed $default = null): mixed

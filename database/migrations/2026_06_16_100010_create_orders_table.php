@@ -26,7 +26,9 @@ return new class extends Migration
             $table->decimal('subtotal', 12, 2);
             $table->decimal('discount_amount', 12, 2)->default(0);
             $table->decimal('delivery_charge', 12, 2)->default(0);
+            $table->decimal('tax_amount', 12, 2)->default(0);
             $table->decimal('total', 12, 2);
+            $table->decimal('refunded_amount', 12, 2)->default(0);
 
             // Customer snapshot (denormalised for history)
             $table->string('customer_name');

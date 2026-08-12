@@ -1,7 +1,7 @@
 @php
     $symbol = $store?->getSetting('currency_symbol', '৳');
 @endphp
-<div class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow border overflow-hidden group">
+<div class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-200 overflow-hidden group">
     <a href="{{ route('products.show', $product) }}" class="block">
         <div class="aspect-square overflow-hidden bg-gray-100">
             <img src="{{ $product->thumbnail_url }}"

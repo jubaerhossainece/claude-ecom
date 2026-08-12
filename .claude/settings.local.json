@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(wsl -d Ubuntu-24.04 -- bash -c \"cd /var/www/claude-ecom && docker compose -f docker/docker-compose.yml exec -T -u www-data -e HOME=/tmp app grep -n 'local.ERROR' storage/logs/laravel.log | tail -3\")"
+    ]
+  }
+}
