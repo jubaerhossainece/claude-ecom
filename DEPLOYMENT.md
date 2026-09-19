@@ -90,15 +90,15 @@ cd ~/traefik && docker compose up -d
 ## Phase 4 — DNS
 
 Add A records for both hostnames pointing at the VPS IP:
-- `ecom.YOURDOMAIN.tld` → VPS_IP
-- `admin.ecom.YOURDOMAIN.tld` → VPS_IP
+- `bechabikri.shomoysoft.com` → VPS_IP
+- `admin.bechabikri.shomoysoft.com` → VPS_IP
 
 Set both to **DNS only** (not proxied) if using Cloudflare — proxied mode
 breaks Let's Encrypt's HTTP-01 challenge. Also check there's no leftover
 **AAAA** record on either hostname pointing elsewhere.
 
-Once you know the real hostnames, put them in `docker/docker-compose.prod.yml`
-in place of `REPLACE_WITH_PROD_DOMAIN` and `REPLACE_WITH_PROD_ADMIN_DOMAIN`.
+(`docker/docker-compose.prod.yml` already has these two hostnames baked into
+its Traefik router rule.)
 
 ## Phase 5 — Clone repo + configure
 
@@ -110,8 +110,8 @@ cp .env.docker.example .env.docker
 
 Edit `.env.docker` — every one of these must be changed from the template default:
 ```
-APP_URL=https://ecom.YOURDOMAIN.tld
-ADMIN_DOMAIN=admin.ecom.YOURDOMAIN.tld
+APP_URL=https://bechabikri.shomoysoft.com
+ADMIN_DOMAIN=admin.bechabikri.shomoysoft.com
 DB_DATABASE=claude_ecom          # must match the DB actually created in Phase 2
 DB_USERNAME=appuser              # must match the user actually created in Phase 2
 DB_PASSWORD=STRONG_PASSWORD_HERE
@@ -193,8 +193,8 @@ exit
 
 ## Phase 10 — Verify
 
-- `https://ecom.YOURDOMAIN.tld` — storefront loads, real TLS padlock, styled
-- `https://admin.ecom.YOURDOMAIN.tld` — Filament admin login (its own subdomain, not `/admin` — see `ADMIN_DOMAIN`)
+- `https://bechabikri.shomoysoft.com` — storefront loads, real TLS padlock, styled
+- `https://admin.bechabikri.shomoysoft.com` — Filament admin login (its own subdomain, not `/admin` — see `ADMIN_DOMAIN`)
 - `docker logs claude-ecom-app-1 --tail 30` — no repeating DB-timeout errors
 - `docker logs claude-ecom-queue-1 --tail 30` — same check
 - `docker logs claude-ecom-nginx-1 --tail 30` — no `502`s

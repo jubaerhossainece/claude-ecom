@@ -1,58 +1,82 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# EcomClaude — Bangladesh B2C Ecommerce Platform
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Laravel 13 single-store ecommerce architected for multi-tenant SaaS. COD-first
+checkout, phone/OTP customer auth, BDT currency, and a Bangladesh address
+structure (Division → District → Thana). PHP 8.4, Filament 3.3, Livewire 3.
 
-## About Laravel
+See `CLAUDE.md` for architecture, data model, and conventions; `docs/BRS.md` /
+`SRS.md` / `FRS.md` for requirements documentation.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Requirements
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- PHP 8.4, with extensions: `pdo_mysql`, `mbstring`, `exif`, `pcntl`,
+  `bcmath`, `gd`, `zip`, `intl`, `opcache`
+- Composer 2
+- Node.js 20+ and npm
+- MySQL 8+, running locally (not in Docker — see [Docker](#docker) below)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Installation
 
 ```bash
-composer require laravel/boost --dev
+git clone git@github-personal:jubaerhossainece/claude-ecom.git
+cd claude-ecom
 
-php artisan boost:install
+composer install
+cp .env.example .env
+php artisan key:generate
+
+npm install
+npm run build          # or `npm run dev` for hot reload while developing
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Create a MySQL database and point `.env` at it — `.env.example` defaults to
+sqlite, but this project runs on MySQL:
 
-## Contributing
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=claude_ecom
+DB_USERNAME=your_user
+DB_PASSWORD=your_password
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+php artisan migrate:fresh --seed   # Bangladesh geo data, store settings, admin user, demo products
+php artisan storage:link           # product/category/brand images are served from here
+```
 
-## Code of Conduct
+Start the app:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+composer run dev   # serve + queue:listen + pail (log viewer) + vite, all in one terminal
+```
 
-## Security Vulnerabilities
+or run each piece separately:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+php artisan serve   # http://localhost:8000
+npm run dev          # Tailwind/Vite hot reload, separate terminal
+```
 
-## License
+## Login
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Access | URL | Login |
+|---|---|---|
+| Admin panel (Filament) | `http://localhost:8000/admin` | `admin@store.test` / `password` |
+| Customer storefront | `http://localhost:8000/login` | Phone + OTP (OTP is written to `storage/logs/laravel.log` in dev — no SMS gateway yet) |
+
+Change the seeded admin password before using this anywhere but local dev.
+
+## Docker
+
+A container-parity / production Docker stack is also available (multi-stage
+build, GHCR images, Traefik). See the "Docker" and "CI/CD" sections in
+`CLAUDE.md`, and `DEPLOYMENT.md` for the full VPS deployment runbook.
+
+## Testing
+
+```bash
+composer run test    # or: php artisan test
+vendor/bin/pint --test
+```
