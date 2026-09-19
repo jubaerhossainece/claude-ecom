@@ -1,0 +1,19 @@
+name: claude-ecom
+
+# Production-only overlay on top of docker-compose.yml — real domain, TLS
+# entrypoint, and the VPS Traefik's ACME certresolver (named "le" in its
+# --certificatesresolvers.le.* command flags). Wired into
+# .github/workflows/deploy.yml's SSH deploy step already — see CLAUDE.md's
+# Docker deployment section.
+#
+# TODO: replace the placeholder domains below with the real production
+# hostnames before the first deploy. Two hostnames because the admin panel
+# is domain-scoped (ADMIN_DOMAIN) rather than path-scoped in production —
+# see AdminPanelProvider.php and config/app.php's "admin_domain".
+
+services:
+  nginx:
+    labels:
+      traefik.http.routers.claudeecom.rule: Host(`bechabikri.shomoysoft.com`) || Host(`admin.bechabikri.shomoysoft.com`)
+      traefik.http.routers.claudeecom.entrypoints: websecure
+      traefik.http.routers.claudeecom.tls.certresolver: le

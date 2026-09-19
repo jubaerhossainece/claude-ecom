@@ -56,6 +56,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Admin Panel Domain
+    |--------------------------------------------------------------------------
+    |
+    | When set, the Filament admin panel (app/Providers/Filament/AdminPanelProvider.php)
+    | binds to this hostname instead of the "/admin" path prefix — e.g.
+    | "admin.ecomclaude.local" locally or "admin.yourdomain.tld" in production,
+    | matching the gasflow (gas-distribution) app's admin-subdomain pattern.
+    | Left unset, "php artisan serve" keeps working at /admin with zero setup.
+    |
+    */
+
+    'admin_domain' => env('ADMIN_DOMAIN'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

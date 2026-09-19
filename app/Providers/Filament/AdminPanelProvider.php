@@ -35,7 +35,11 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('admin')
+            ->when(
+                config('app.admin_domain'),
+                fn (Panel $panel, string $domain) => $panel->domain($domain),
+                fn (Panel $panel) => $panel->path('admin'),
+            )
             ->login()
             ->colors([
                 'primary' => Color::Green,
