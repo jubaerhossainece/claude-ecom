@@ -101,15 +101,20 @@ class OrderResource extends Resource
                         ->columnSpan(2),
                 ])->columns(3),
 
-            Infolists\Components\RepeatableEntry::make('items')
+            Infolists\Components\Section::make('Items')
                 ->schema([
-                    Infolists\Components\TextEntry::make('product_name')->weight('bold'),
-                    Infolists\Components\TextEntry::make('variant_label')->placeholder('—'),
-                    Infolists\Components\TextEntry::make('unit_price')->money('BDT'),
-                    Infolists\Components\TextEntry::make('quantity'),
-                    Infolists\Components\TextEntry::make('subtotal')->money('BDT'),
-                ])
-                ->columns(5),
+                    Infolists\Components\RepeatableEntry::make('items')
+                        ->hiddenLabel()
+                        ->contained(false)
+                        ->schema([
+                            Infolists\Components\TextEntry::make('product_name')->weight('bold'),
+                            Infolists\Components\TextEntry::make('variant_label')->placeholder('—'),
+                            Infolists\Components\TextEntry::make('unit_price')->money('BDT'),
+                            Infolists\Components\TextEntry::make('quantity'),
+                            Infolists\Components\TextEntry::make('subtotal')->money('BDT'),
+                        ])
+                        ->columns(['default' => 1, 'sm' => 2, 'lg' => 5]),
+                ]),
         ]);
     }
 
