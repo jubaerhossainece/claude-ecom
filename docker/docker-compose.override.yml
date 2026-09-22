@@ -1,0 +1,55 @@
+name: claude-ecom
+
+# Local-dev-only overlay — bind-mounts the repo into app/queue/nginx so a
+# Blade/PHP/CSS/JS edit on the host shows up on the next request, with no
+# image rebuild and no container restart. NEVER used in production:
+# .github/workflows/deploy.yml only ever references docker-compose.yml +
+# docker-compose.prod.yml, this file is never in that list.
+#
+# Usage (note the explicit -f — this is never auto-applied):
+#   docker compose -f docker/docker-compose.yml -f docker/docker-compose.override.yml --env-file .env.docker up -d
+#
+# Runs app/queue as root purely so the container can read/write files owned
+# by your host user through the bind mount without a uid/gid dance — fine
+# for a local-only container, not how the real (production) image runs.
+#
+# Frontend assets: run `npm run dev` / `npm run build` on the host as usual
+# (see CLAUDE.md) — the nginx bind mount below picks up whatever lands in
+# public/build immediately. This does not wire up Vite's HMR dev server
+# through Traefik; for hot-reload-while-typing, use `php artisan serve` +
+# `npm run dev` directly on the host instead, per Essential Commands.
+
+services:
+  app:
+    user: root
+    # FPM refuses to run its pool as root without this explicit opt-in
+    # (see zz-local.conf below) — fine for a local-only container.
+    command: ["php-fpm", "--allow-to-run-as-root"]
+    environment:
+      SKIP_BOOT_CACHE: "true"
+    volumes:
+      - ..:/var/www/html
+      - ../storage:/var/www/html/storage
+      # opcache.ini bakes in validate_timestamps=0 for production (skip a
+      # stat() per request) — that means an edited file is never picked up
+      # without an FPM restart. This override re-enables timestamp checks.
+      - ./php/opcache.local.ini:/usr/local/etc/php/conf.d/opcache.ini:ro
+      # www.conf runs FPM *workers* as www-data regardless of this service's
+      # own `user: root` (that only affects the master process) — this pool
+      # override keeps workers root too, so they can read/write the
+      # host-owned bind-mounted files without a uid/gid mismatch.
+      - ./php/fpm-local.conf:/usr/local/etc/php-fpm.d/zz-local.conf:ro
+
+  queue:
+    user: root
+    environment:
+      SKIP_BOOT_CACHE: "true"
+    volumes:
+      - ..:/var/www/html
+      - ../storage:/var/www/html/storage
+      - ./php/opcache.local.ini:/usr/local/etc/php/conf.d/opcache.ini:ro
+      - ./php/fpm-local.conf:/usr/local/etc/php-fpm.d/zz-local.conf:ro
+
+  nginx:
+    volumes:
+      - ../public:/var/www/html/public

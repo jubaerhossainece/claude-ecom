@@ -9,9 +9,15 @@ if [ -n "$DB_HOST" ]; then
     echo "Database is up."
 fi
 
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+# Skipped when bind-mounting the repo for local dev (docker-compose.override.yml
+# sets this) — caching a view/route/config on boot would keep serving the
+# cached copy even after you edit a Blade/PHP file on the host, defeating the
+# whole point of the bind mount.
+if [ "$SKIP_BOOT_CACHE" != "true" ]; then
+    php artisan config:cache
+    php artisan route:cache
+    php artisan view:cache
+fi
 
 # Deliberately NOT running migrate:fresh here, ever — see CLAUDE.md for why.
 # Set RUN_MIGRATIONS=true to apply pending migrations (non-destructive) on boot.
