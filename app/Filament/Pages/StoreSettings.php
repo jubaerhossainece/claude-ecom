@@ -11,9 +11,13 @@ use Filament\Pages\Page;
 class StoreSettings extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
+
     protected static string $view = 'filament.pages.store-settings';
+
     protected static ?string $navigationGroup = 'Configuration';
+
     protected static ?int $navigationSort = 1;
+
     protected static ?string $title = 'Store Settings';
 
     public array $data = [];

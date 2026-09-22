@@ -110,6 +110,7 @@ class FakeDataSeeder extends Seeder
                 'sort_order' => $i,
             ]));
         }
+
         return $created;
     }
 
@@ -167,6 +168,7 @@ class FakeDataSeeder extends Seeder
                 $categories[$child['slug']] = $cat;
             }
         }
+
         return $categories;
     }
 
@@ -197,6 +199,7 @@ class FakeDataSeeder extends Seeder
                 'sort_order' => $i,
             ]);
         }
+
         return $created;
     }
 
@@ -212,6 +215,7 @@ class FakeDataSeeder extends Seeder
                 'slug' => Str::slug($name),
             ]);
         }
+
         return $created;
     }
 
@@ -343,14 +347,14 @@ class FakeDataSeeder extends Seeder
                 'name' => $def['name'],
                 'slug' => Str::slug($def['name']),
                 'short_description' => Str::limit($def['desc'], 120),
-                'description' => '<p>' . $def['desc'] . '</p><p>Order now and get fast delivery across Bangladesh. Cash on delivery available.</p>',
+                'description' => '<p>'.$def['desc'].'</p><p>Order now and get fast delivery across Bangladesh. Cash on delivery available.</p>',
                 'status' => $def['status'],
                 'is_featured' => $def['featured'],
                 'unit_of_sale' => $def['unit'],
                 'base_price' => $def['price'],
                 'sale_price' => $def['sale'],
                 'cost_price' => round($def['price'] * 0.6),
-                'sku' => 'SKU-' . strtoupper(Str::random(6)),
+                'sku' => 'SKU-'.strtoupper(Str::random(6)),
                 'low_stock_threshold' => 5,
                 'track_inventory' => true,
                 'sort_order' => $i,
@@ -387,7 +391,7 @@ class FakeDataSeeder extends Seeder
 
                 $variant = ProductVariant::create([
                     'product_id' => $product->id,
-                    'sku' => 'VAR-' . strtoupper(Str::random(5)),
+                    'sku' => 'VAR-'.strtoupper(Str::random(5)),
                     'attribute_values' => $attrValues,
                     'variant_label' => $label,
                     'price' => $varDef['price'],
@@ -462,13 +466,14 @@ class FakeDataSeeder extends Seeder
                     'district_id' => $district->id,
                     'thana_id' => $thana?->id ?? $district->thanas()->first()?->id,
                     'area' => 'Main Road',
-                    'address_line' => 'House ' . rand(1, 99) . ', Road ' . rand(1, 20),
+                    'address_line' => 'House '.rand(1, 99).', Road '.rand(1, 20),
                     'is_default' => true,
                 ]);
             }
 
             $customers[] = $customer;
         }
+
         return $customers;
     }
 
@@ -490,7 +495,9 @@ class FakeDataSeeder extends Seeder
 
         foreach ($customers as $customerIdx => $customer) {
             $address = $customer->defaultAddress();
-            if (! $address) continue;
+            if (! $address) {
+                continue;
+            }
 
             $orderCount = rand(1, 4);
             for ($o = 0; $o < $orderCount; $o++) {
@@ -551,7 +558,7 @@ class FakeDataSeeder extends Seeder
                         ? 'Support Agent'
                         : null,
                     'courier_name' => in_array($finalStatus, ['shipped', 'delivered']) ? collect(['Pathao', 'Steadfast', 'RedX'])->random() : null,
-                    'courier_tracking_id' => in_array($finalStatus, ['shipped', 'delivered']) ? 'TRK' . strtoupper(Str::random(8)) : null,
+                    'courier_tracking_id' => in_array($finalStatus, ['shipped', 'delivered']) ? 'TRK'.strtoupper(Str::random(8)) : null,
                     'shipped_at' => in_array($finalStatus, ['shipped', 'delivered']) ? $createdAt->copy()->addDays(2) : null,
                     'delivered_at' => $finalStatus === 'delivered' ? $createdAt->copy()->addDays(4) : null,
                     'created_at' => $createdAt,
@@ -579,11 +586,11 @@ class FakeDataSeeder extends Seeder
                     OrderStatusHistory::create([
                         'order_id' => $order->id,
                         'status' => $status,
-                        'note' => match($status) {
+                        'note' => match ($status) {
                             'pending' => 'Order placed by customer',
                             'confirmed' => 'COD confirmed by support agent',
                             'processing' => 'Order being prepared',
-                            'shipped' => 'Handed to ' . ($order->courier_name ?? 'courier'),
+                            'shipped' => 'Handed to '.($order->courier_name ?? 'courier'),
                             'delivered' => 'Delivered to customer',
                             'cancelled' => 'Cancelled by customer',
                             default => '',

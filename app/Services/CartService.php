@@ -37,7 +37,9 @@ class CartService
         $cartId = Session::get($this->sessionKey);
         if ($cartId) {
             $cart = Cart::find($cartId);
-            if ($cart) return $cart->load('items.product', 'items.variant');
+            if ($cart) {
+                return $cart->load('items.product', 'items.variant');
+            }
         }
 
         $cart = Cart::create([
@@ -65,6 +67,7 @@ class CartService
 
         if ($existing) {
             $existing->increment('quantity', $quantity);
+
             return $existing;
         }
 
@@ -105,16 +108,21 @@ class CartService
     public function getItemCount(): int
     {
         $cartId = Session::get($this->sessionKey);
-        if (! $cartId && ! Auth::guard('customer')->check()) return 0;
+        if (! $cartId && ! Auth::guard('customer')->check()) {
+            return 0;
+        }
 
         $cart = $this->getOrCreateCart();
+
         return $cart->items->sum('quantity');
     }
 
     private function mergeSessionCart(Cart $userCart, int $sessionCartId): void
     {
         $sessionCart = Cart::with('items')->find($sessionCartId);
-        if (! $sessionCart) return;
+        if (! $sessionCart) {
+            return;
+        }
 
         foreach ($sessionCart->items as $item) {
             $existing = $userCart->items()

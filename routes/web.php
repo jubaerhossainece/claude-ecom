@@ -12,6 +12,11 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReturnRequestController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\WishlistController;
+use App\Models\District;
+use App\Models\Division;
+use App\Models\Order;
+use App\Models\Store;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 // Storefront (page views tracked for the conversion-rate dashboard stat)
@@ -74,18 +79,18 @@ Route::middleware('auth:customer')->prefix('account')->name('account.')->group(f
 // Admin-only report downloads (Filament panel itself is registered separately)
 Route::middleware('auth:web')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/inventory-report/export', function () {
-        $store = App\Models\Store::current();
+        $store = Store::current();
 
-        $rows = Illuminate\Support\Facades\DB::table('warehouse_stocks')
+        $rows = DB::table('warehouse_stocks')
             ->join('products', 'products.id', '=', 'warehouse_stocks.product_id')
             ->join('warehouses', 'warehouses.id', '=', 'warehouse_stocks.warehouse_id')
             ->where('products.store_id', $store->id)
             ->select(
                 'warehouses.name as warehouse_name',
-                Illuminate\Support\Facades\DB::raw('SUM(warehouse_stocks.quantity) as on_hand'),
-                Illuminate\Support\Facades\DB::raw('SUM(warehouse_stocks.reserved_quantity) as reserved'),
-                Illuminate\Support\Facades\DB::raw('SUM(warehouse_stocks.quantity * COALESCE(products.cost_price, 0)) as value'),
-                Illuminate\Support\Facades\DB::raw('COUNT(DISTINCT warehouse_stocks.product_id) as product_count')
+                DB::raw('SUM(warehouse_stocks.quantity) as on_hand'),
+                DB::raw('SUM(warehouse_stocks.reserved_quantity) as reserved'),
+                DB::raw('SUM(warehouse_stocks.quantity * COALESCE(products.cost_price, 0)) as value'),
+                DB::raw('COUNT(DISTINCT warehouse_stocks.product_id) as product_count')
             )
             ->groupBy('warehouses.id', 'warehouses.name')
             ->orderBy('warehouses.name')
@@ -98,10 +103,10 @@ Route::middleware('auth:web')->prefix('admin')->name('admin.')->group(function (
                 fputcsv($out, [$row->warehouse_name, $row->product_count, $row->on_hand, $row->reserved, $row->value]);
             }
             fclose($out);
-        }, 'inventory-report-' . now()->format('Y-m-d') . '.csv');
+        }, 'inventory-report-'.now()->format('Y-m-d').'.csv');
     })->name('inventory-report.export');
 
-    Route::get('/orders/{order}/invoice', function (App\Models\Order $order) {
+    Route::get('/orders/{order}/invoice', function (Order $order) {
         $order->load('items', 'store');
 
         return view('orders.invoice', ['order' => $order]);
@@ -111,10 +116,10 @@ Route::middleware('auth:web')->prefix('admin')->name('admin.')->group(function (
 // API endpoints for Livewire/AJAX
 Route::get('/api/search-autocomplete', [ProductController::class, 'autocomplete'])->name('products.autocomplete');
 
-Route::get('/api/districts/{division}', function (App\Models\Division $division) {
+Route::get('/api/districts/{division}', function (Division $division) {
     return $division->districts()->select('id', 'name', 'bn_name')->orderBy('name')->get();
 })->name('api.districts');
 
-Route::get('/api/thanas/{district}', function (App\Models\District $district) {
+Route::get('/api/thanas/{district}', function (District $district) {
     return $district->thanas()->select('id', 'name', 'bn_name')->orderBy('name')->get();
 })->name('api.thanas');

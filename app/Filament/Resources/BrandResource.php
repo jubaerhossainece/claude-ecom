@@ -18,8 +18,11 @@ use Illuminate\Support\Str;
 class BrandResource extends Resource
 {
     protected static ?string $model = Brand::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-tag';
+
     protected static ?string $navigationGroup = 'Catalog';
+
     protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
@@ -33,8 +36,7 @@ class BrandResource extends Resource
                     Forms\Components\TextInput::make('name')
                         ->required()
                         ->live(onBlur: true)
-                        ->afterStateUpdated(fn ($state, Forms\Set $set) =>
-                            $set('slug', Str::slug($state))),
+                        ->afterStateUpdated(fn ($state, Forms\Set $set) => $set('slug', Str::slug($state))),
 
                     Forms\Components\TextInput::make('slug')
                         ->required()

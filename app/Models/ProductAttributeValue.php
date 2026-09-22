@@ -31,7 +31,8 @@ class ProductAttributeValue extends Model
         if ($this->attribute->type === 'boolean') {
             return $this->value ? 'Yes' : 'No';
         }
-        $unit = $this->attribute->unit ? ' ' . $this->attribute->unit : '';
-        return ($this->value ?? '') . $unit;
+        $unit = $this->attribute->unit ? ' '.$this->attribute->unit : '';
+
+        return ($this->value ?? '').$unit;
     }
 }

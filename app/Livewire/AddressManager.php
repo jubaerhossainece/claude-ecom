@@ -2,7 +2,6 @@
 
 namespace App\Livewire;
 
-use App\Models\CustomerAddress;
 use App\Models\District;
 use App\Models\Division;
 use App\Models\Thana;
@@ -12,16 +11,25 @@ use Livewire\Component;
 class AddressManager extends Component
 {
     public bool $showForm = false;
+
     public ?int $editingId = null;
 
     public string $label = 'Home';
+
     public string $name = '';
+
     public string $phone = '';
+
     public ?int $division_id = null;
+
     public ?int $district_id = null;
+
     public ?int $thana_id = null;
+
     public string $area = '';
+
     public string $address_line = '';
+
     public bool $is_default = false;
 
     protected function rules(): array

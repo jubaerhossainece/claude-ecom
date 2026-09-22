@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\OrderStatusUpdated;
 use App\Services\OrderService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -142,7 +143,7 @@ class Order extends Model
         parent::boot();
         static::creating(function ($order) {
             if (! $order->order_number) {
-                $order->order_number = 'ORD-' . strtoupper(uniqid());
+                $order->order_number = 'ORD-'.strtoupper(uniqid());
             }
         });
 
@@ -169,7 +170,7 @@ class Order extends Model
 
         static::updated(function (Order $order) {
             if ($order->wasChanged('status') && $order->customer) {
-                $order->customer->notify(new \App\Notifications\OrderStatusUpdated($order, $order->status));
+                $order->customer->notify(new OrderStatusUpdated($order, $order->status));
             }
         });
     }

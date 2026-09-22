@@ -10,9 +10,13 @@ use Livewire\Component;
 class ProductVariantSelector extends Component
 {
     public Product $product;
+
     public array $selectedAttributes = [];
+
     public ?int $selectedVariantId = null;
+
     public int $quantity = 1;
+
     public bool $added = false;
 
     public function mount(): void
@@ -29,6 +33,7 @@ class ProductVariantSelector extends Component
                 $axes[$slug][$value] = $value;
             }
         }
+
         return $axes;
     }
 
@@ -66,6 +71,7 @@ class ProductVariantSelector extends Component
 
         if ($this->product->variants->isNotEmpty() && ! $variantId) {
             $this->addError('variant', 'Please select all options.');
+
             return;
         }
 

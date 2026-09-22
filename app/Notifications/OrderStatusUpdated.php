@@ -21,7 +21,7 @@ class OrderStatusUpdated extends Notification
         $messages = [
             'confirmed' => "Your order {$this->order->order_number} has been confirmed.",
             'processing' => "Your order {$this->order->order_number} is being processed.",
-            'shipped' => "Your order {$this->order->order_number} has shipped" . ($this->order->courier_name ? " via {$this->order->courier_name}" : '') . '.',
+            'shipped' => "Your order {$this->order->order_number} has shipped".($this->order->courier_name ? " via {$this->order->courier_name}" : '').'.',
             'delivered' => "Your order {$this->order->order_number} has been delivered. Enjoy!",
             'cancelled' => "Your order {$this->order->order_number} was cancelled.",
             'returned' => "Your order {$this->order->order_number} was marked as returned.",

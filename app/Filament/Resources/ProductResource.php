@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
-use App\Models\Attribute;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\InventoryMovement;
@@ -22,8 +21,11 @@ use Illuminate\Support\Str;
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
+
     protected static ?string $navigationGroup = 'Catalog';
+
     protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
@@ -38,8 +40,7 @@ class ProductResource extends Resource
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn ($state, Forms\Set $set) =>
-                                $set('slug', Str::slug($state)))
+                            ->afterStateUpdated(fn ($state, Forms\Set $set) => $set('slug', Str::slug($state)))
                             ->columnSpanFull(),
 
                         Forms\Components\TextInput::make('slug')
@@ -54,7 +55,7 @@ class ProductResource extends Resource
                                 ->with('parent')
                                 ->get()
                                 ->mapWithKeys(fn ($cat) => [
-                                    $cat->id => ($cat->parent ? $cat->parent->name . ' › ' : '') . $cat->name,
+                                    $cat->id => ($cat->parent ? $cat->parent->name.' › ' : '').$cat->name,
                                 ]))
                             ->searchable()
                             ->required(),
@@ -280,7 +281,7 @@ class ProductResource extends Resource
                     ->icon('heroicon-o-document-duplicate')
                     ->excludeAttributes(['slug', 'sku'])
                     ->beforeReplicaSaved(function (Product $replica) {
-                        $replica->slug = Str::slug($replica->name) . '-copy-' . Str::lower(Str::random(4));
+                        $replica->slug = Str::slug($replica->name).'-copy-'.Str::lower(Str::random(4));
                         $replica->sku = null;
                         $replica->status = 'draft';
                     })
@@ -330,7 +331,7 @@ class ProductResource extends Resource
                             return [
                                 'warehouse_id' => $warehouse->id,
                                 'variant_id' => $variant?->id,
-                                'label' => $warehouse->name . ($variant ? ' — ' . $variant->variant_label : ''),
+                                'label' => $warehouse->name.($variant ? ' — '.$variant->variant_label : ''),
                                 'quantity' => $stockRow->quantity ?? 0,
                                 'reserved' => $stockRow->reserved_quantity ?? 0,
                                 'reason' => '',
@@ -414,17 +415,17 @@ class ProductResource extends Resource
 
                         $options = $variants->isNotEmpty()
                             ? $variants->flatMap(fn ($variant) => $warehouses->map(fn ($warehouse) => [
-                                'value' => $warehouse->id . ':' . $variant->id,
-                                'label' => $warehouse->name . ' — ' . $variant->variant_label,
+                                'value' => $warehouse->id.':'.$variant->id,
+                                'label' => $warehouse->name.' — '.$variant->variant_label,
                             ]))
                             : $warehouses->map(fn ($warehouse) => [
-                                'value' => $warehouse->id . ':',
+                                'value' => $warehouse->id.':',
                                 'label' => $warehouse->name,
                             ]);
 
                         return [
                             Forms\Components\Select::make('target')
-                                ->label('Warehouse' . ($variants->isNotEmpty() ? ' / Variant' : ''))
+                                ->label('Warehouse'.($variants->isNotEmpty() ? ' / Variant' : ''))
                                 ->options($options->pluck('label', 'value'))
                                 ->required(),
                             Forms\Components\TextInput::make('quantity')
@@ -451,6 +452,7 @@ class ProductResource extends Resource
 
                         if ($qty <= 0) {
                             Notification::make()->title('No on-hand stock to write off')->danger()->send();
+
                             return;
                         }
 

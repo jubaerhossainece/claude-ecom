@@ -14,7 +14,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Product extends Model implements HasMedia
 {
-    use SoftDeletes, InteractsWithMedia, Searchable;
+    use InteractsWithMedia, Searchable, SoftDeletes;
 
     protected $fillable = [
         'store_id', 'category_id', 'brand_id', 'name', 'slug', 'short_description', 'description',
@@ -36,6 +36,7 @@ class Product extends Model implements HasMedia
     ];
 
     public const STATUSES = ['draft', 'active', 'inactive', 'archived'];
+
     public const UNITS = ['piece', 'kg', 'gram', 'litre', 'ml', 'pack', 'dozen', 'bundle', 'set', 'pair'];
 
     public function store(): BelongsTo
@@ -145,6 +146,7 @@ class Product extends Model implements HasMedia
         if (! $this->track_inventory) {
             return true;
         }
+
         return $this->stock_quantity > 0 || $this->allow_backorder;
     }
 
@@ -156,6 +158,7 @@ class Product extends Model implements HasMedia
     public function getThumbnailUrlAttribute(): string
     {
         $media = $this->getFirstMedia('thumbnail') ?? $this->getFirstMedia('images');
+
         return $media ? $media->getUrl('thumb') : asset('images/placeholder.png');
     }
 

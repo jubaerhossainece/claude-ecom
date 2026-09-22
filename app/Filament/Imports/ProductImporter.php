@@ -63,7 +63,7 @@ class ProductImporter extends Importer
                 ->rules(['nullable', 'numeric', 'min:0']),
 
             ImportColumn::make('status')
-                ->rules(['nullable', 'in:' . implode(',', Product::STATUSES)]),
+                ->rules(['nullable', 'in:'.implode(',', Product::STATUSES)]),
 
             ImportColumn::make('track_inventory')
                 ->boolean(),
@@ -92,7 +92,7 @@ class ProductImporter extends Importer
             }
         }
 
-        $product = new Product();
+        $product = new Product;
         $product->store_id = $storeId;
         $product->status = 'draft';
         $product->unit_of_sale = 'piece';
@@ -104,7 +104,7 @@ class ProductImporter extends Importer
     protected function afterFill(): void
     {
         if (blank($this->record->slug)) {
-            $this->record->slug = Str::slug($this->record->name) . '-' . Str::lower(Str::random(4));
+            $this->record->slug = Str::slug($this->record->name).'-'.Str::lower(Str::random(4));
         }
     }
 
@@ -128,10 +128,10 @@ class ProductImporter extends Importer
 
     public static function getCompletedNotificationBody(Import $import): string
     {
-        $body = 'Your product import has completed and ' . number_format($import->successful_rows) . ' ' . str('row')->plural($import->successful_rows) . ' imported.';
+        $body = 'Your product import has completed and '.number_format($import->successful_rows).' '.str('row')->plural($import->successful_rows).' imported.';
 
         if ($failedRowsCount = $import->getFailedRowsCount()) {
-            $body .= ' ' . number_format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to import.';
+            $body .= ' '.number_format($failedRowsCount).' '.str('row')->plural($failedRowsCount).' failed to import.';
         }
 
         return $body;

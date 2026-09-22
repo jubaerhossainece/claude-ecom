@@ -9,7 +9,9 @@ use Livewire\Component;
 class AddToCartButton extends Component
 {
     public Product $product;
+
     public int $quantity = 1;
+
     public bool $added = false;
 
     public function increment(): void

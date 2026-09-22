@@ -17,8 +17,11 @@ use Illuminate\Database\Eloquent\Builder;
 class CustomerResource extends Resource
 {
     protected static ?string $model = Customer::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-users';
+
     protected static ?string $navigationGroup = 'Customers';
+
     protected static ?int $navigationSort = 1;
 
     public static function getEloquentQuery(): Builder

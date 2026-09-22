@@ -35,18 +35,18 @@ class SalesOverviewWidget extends BaseWidget
             ->count();
 
         return [
-            Stat::make('Today\'s Sales', '৳ ' . number_format($todaySales, 0))
+            Stat::make('Today\'s Sales', '৳ '.number_format($todaySales, 0))
                 ->description('Revenue today')
                 ->color('success'),
-            Stat::make('Total Sales', '৳ ' . number_format($totalSales, 0))
+            Stat::make('Total Sales', '৳ '.number_format($totalSales, 0))
                 ->description('All time'),
-            Stat::make('Monthly Revenue', '৳ ' . number_format($monthlyRevenue, 0))
+            Stat::make('Monthly Revenue', '৳ '.number_format($monthlyRevenue, 0))
                 ->description(now()->format('F Y')),
-            Stat::make('Yearly Revenue', '৳ ' . number_format($yearlyRevenue, 0))
+            Stat::make('Yearly Revenue', '৳ '.number_format($yearlyRevenue, 0))
                 ->description(now()->format('Y')),
-            Stat::make('Average Order Value', '৳ ' . number_format($averageOrderValue, 0))
+            Stat::make('Average Order Value', '৳ '.number_format($averageOrderValue, 0))
                 ->description('Per order, all time'),
-            Stat::make('Conversion Rate', $conversionRate === null ? 'N/A' : number_format($conversionRate, 1) . '%')
+            Stat::make('Conversion Rate', $conversionRate === null ? 'N/A' : number_format($conversionRate, 1).'%')
                 ->description($conversionRate === null ? 'No visits tracked yet' : 'Last 30 days'),
             Stat::make('Pending Orders', $pendingOrders)
                 ->description('Need attention')

@@ -64,6 +64,7 @@ class ProductVariant extends Model implements HasMedia
         if (! $this->product->track_inventory) {
             return true;
         }
+
         return $this->stock_quantity > 0 || $this->product->allow_backorder;
     }
 

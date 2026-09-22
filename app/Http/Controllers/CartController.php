@@ -12,6 +12,7 @@ class CartController extends Controller
     public function index()
     {
         $cart = $this->cartService->getOrCreateCart();
+
         return view('storefront.cart', compact('cart'));
     }
 
@@ -47,6 +48,7 @@ class CartController extends Controller
     public function remove(int $item)
     {
         $this->cartService->removeItem($item);
+
         return back()->with('success', 'Item removed.');
     }
 }

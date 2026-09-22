@@ -16,10 +16,15 @@ class StockAlerts extends Page implements HasTable
     use InteractsWithTable;
 
     protected static ?string $navigationIcon = 'heroicon-o-exclamation-triangle';
+
     protected static string $view = 'filament.pages.stock-alerts';
+
     protected static ?string $navigationGroup = 'Inventory';
+
     protected static ?string $navigationLabel = 'Stock Alerts';
+
     protected static ?int $navigationSort = 3;
+
     protected static ?string $title = 'Stock Alerts';
 
     public function table(Table $table): Table
@@ -53,7 +58,7 @@ class StockAlerts extends Page implements HasTable
                 Tables\Actions\Action::make('manage')
                     ->label('Manage Stock')
                     ->icon('heroicon-o-archive-box')
-                    ->url(fn (Product $record) => ProductResource::getUrl('index') . '?tableSearch=' . urlencode($record->name)),
+                    ->url(fn (Product $record) => ProductResource::getUrl('index').'?tableSearch='.urlencode($record->name)),
             ]);
     }
 }

@@ -10,10 +10,15 @@ use Illuminate\Support\Facades\DB;
 class InventoryReport extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar-square';
+
     protected static string $view = 'filament.pages.inventory-report';
+
     protected static ?string $navigationGroup = 'Inventory';
+
     protected static ?string $navigationLabel = 'Inventory Report';
+
     protected static ?int $navigationSort = 4;
+
     protected static ?string $title = 'Inventory Report';
 
     public function getViewData(): array

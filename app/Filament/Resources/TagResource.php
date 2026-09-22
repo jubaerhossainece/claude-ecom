@@ -15,8 +15,11 @@ use Illuminate\Support\Str;
 class TagResource extends Resource
 {
     protected static ?string $model = Tag::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-hashtag';
+
     protected static ?string $navigationGroup = 'Catalog';
+
     protected static ?int $navigationSort = 5;
 
     public static function form(Form $form): Form
@@ -28,8 +31,7 @@ class TagResource extends Resource
             Forms\Components\TextInput::make('name')
                 ->required()
                 ->live(onBlur: true)
-                ->afterStateUpdated(fn ($state, Forms\Set $set) =>
-                    $set('slug', Str::slug($state))),
+                ->afterStateUpdated(fn ($state, Forms\Set $set) => $set('slug', Str::slug($state))),
 
             Forms\Components\TextInput::make('slug')
                 ->required()

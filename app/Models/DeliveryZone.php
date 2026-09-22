@@ -30,6 +30,7 @@ class DeliveryZone extends Model
         if ($this->free_delivery_above && $subtotal >= $this->free_delivery_above) {
             return 0;
         }
+
         return $this->delivery_charge;
     }
 
@@ -38,6 +39,7 @@ class DeliveryZone extends Model
         if ($this->type === 'nationwide') {
             return true;
         }
+
         return in_array($districtId, $this->location_ids ?? []);
     }
 }

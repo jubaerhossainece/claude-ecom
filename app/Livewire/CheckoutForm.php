@@ -11,26 +11,39 @@ use App\Models\Store;
 use App\Models\Thana;
 use App\Services\CartService;
 use App\Services\OrderService;
-use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
 
 class CheckoutForm extends Component
 {
     public string $name = '';
+
     public string $phone = '';
+
     public string $email = '';
+
     public ?int $division_id = null;
+
     public ?int $district_id = null;
+
     public ?int $thana_id = null;
+
     public string $area = '';
+
     public string $address_line = '';
+
     public string $payment_method = 'cod';
+
     public string $coupon_code = '';
+
     public string $notes = '';
 
     public float $deliveryCharge = 0;
+
     public float $discountAmount = 0;
+
     public ?string $couponError = null;
+
     public ?string $couponSuccess = null;
 
     protected function rules(): array
@@ -108,6 +121,7 @@ class CheckoutForm extends Component
     {
         if (! $this->district_id) {
             $this->deliveryCharge = 0;
+
             return;
         }
 
@@ -120,6 +134,7 @@ class CheckoutForm extends Component
         foreach ($zones as $zone) {
             if ($zone->type === 'district' && in_array($this->district_id, $zone->location_ids ?? [])) {
                 $this->deliveryCharge = $zone->getChargeForOrder($subtotal);
+
                 return;
             }
         }
@@ -133,7 +148,9 @@ class CheckoutForm extends Component
         $this->couponError = null;
         $this->couponSuccess = null;
 
-        if (! $this->coupon_code) return;
+        if (! $this->coupon_code) {
+            return;
+        }
 
         $store = Store::current();
         $cart = $cartService->getOrCreateCart();
@@ -142,11 +159,12 @@ class CheckoutForm extends Component
         if (! $coupon || ! $coupon->isValid($cart->subtotal, auth('customer')->id())) {
             $this->couponError = 'Invalid, expired, or already-used coupon code.';
             $this->discountAmount = 0;
+
             return;
         }
 
         $this->discountAmount = $coupon->calculateDiscount($cart->subtotal);
-        $this->couponSuccess = 'Coupon applied! Saving ৳' . number_format($this->discountAmount, 0);
+        $this->couponSuccess = 'Coupon applied! Saving ৳'.number_format($this->discountAmount, 0);
     }
 
     public function placeOrder(CartService $cartService, OrderService $orderService)
@@ -156,6 +174,7 @@ class CheckoutForm extends Component
         $cart = $cartService->getOrCreateCart();
         if ($cart->items->isEmpty()) {
             $this->addError('cart', 'Your cart is empty.');
+
             return;
         }
 
@@ -178,6 +197,7 @@ class CheckoutForm extends Component
             ]);
         } catch (InsufficientStockException $e) {
             $this->addError('cart', $e->getMessage());
+
             return;
         }
 

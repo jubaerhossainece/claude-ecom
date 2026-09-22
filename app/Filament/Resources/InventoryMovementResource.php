@@ -12,9 +12,13 @@ use Filament\Tables\Table;
 class InventoryMovementResource extends Resource
 {
     protected static ?string $model = InventoryMovement::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
+
     protected static ?string $navigationLabel = 'Inventory Movements';
+
     protected static ?string $navigationGroup = 'Inventory';
+
     protected static ?int $navigationSort = 2;
 
     public static function canCreate(): bool
@@ -50,7 +54,7 @@ class InventoryMovementResource extends Resource
                 Tables\Columns\TextColumn::make('quantity_change')
                     ->label('Change')
                     ->color(fn ($state) => $state >= 0 ? 'success' : 'danger')
-                    ->formatStateUsing(fn ($state) => ($state >= 0 ? '+' : '') . $state),
+                    ->formatStateUsing(fn ($state) => ($state >= 0 ? '+' : '').$state),
 
                 Tables\Columns\TextColumn::make('quantity_after')
                     ->label('Balance'),

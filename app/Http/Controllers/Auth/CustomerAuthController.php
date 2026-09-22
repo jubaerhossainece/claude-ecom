@@ -72,6 +72,7 @@ class CustomerAuthController extends Controller
             if ($verification->attempts >= 5) {
                 return back()->withErrors(['otp' => 'Too many attempts. Request a new OTP.']);
             }
+
             return back()->withErrors(['otp' => 'Invalid or expired OTP.']);
         }
 

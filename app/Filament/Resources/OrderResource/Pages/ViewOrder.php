@@ -16,7 +16,7 @@ class ViewOrder extends ViewRecord
         return [Actions\EditAction::make()];
     }
 
-    public function getMaxContentWidth(): MaxWidth | string | null
+    public function getMaxContentWidth(): MaxWidth|string|null
     {
         return MaxWidth::Full;
     }

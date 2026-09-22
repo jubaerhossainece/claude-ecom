@@ -13,6 +13,7 @@ use App\Models\Order;
 use App\Models\Store;
 use App\Models\Thana;
 use App\Models\WarehouseStock;
+use App\Notifications\OrderPlaced;
 use Illuminate\Support\Facades\DB;
 
 class OrderService
@@ -127,7 +128,7 @@ class OrderService
             $order->addStatusHistory('pending', 'Order placed', $checkoutData['name']);
 
             if ($order->customer) {
-                $order->customer->notify(new \App\Notifications\OrderPlaced($order));
+                $order->customer->notify(new OrderPlaced($order));
             }
 
             $cart->items()->delete();

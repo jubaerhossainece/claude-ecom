@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CategoryResource\Pages;
-use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\Store;
 use Filament\Forms;
@@ -16,8 +15,11 @@ use Illuminate\Support\Str;
 class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
+
     protected static ?string $navigationGroup = 'Catalog';
+
     protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
@@ -39,8 +41,7 @@ class CategoryResource extends Resource
                     Forms\Components\TextInput::make('name')
                         ->required()
                         ->live(onBlur: true)
-                        ->afterStateUpdated(fn ($state, Forms\Set $set) =>
-                            $set('slug', Str::slug($state))),
+                        ->afterStateUpdated(fn ($state, Forms\Set $set) => $set('slug', Str::slug($state))),
 
                     Forms\Components\TextInput::make('slug')
                         ->required()

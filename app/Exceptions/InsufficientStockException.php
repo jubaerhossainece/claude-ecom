@@ -4,6 +4,4 @@ namespace App\Exceptions;
 
 use Exception;
 
-class InsufficientStockException extends Exception
-{
-}
+class InsufficientStockException extends Exception {}

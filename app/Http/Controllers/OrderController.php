@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use App\Services\CartService;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,7 +19,7 @@ class OrderController extends Controller
         return view('storefront.account.orders', compact('orders'));
     }
 
-    public function show(\App\Models\Order $order)
+    public function show(Order $order)
     {
         $customer = Auth::guard('customer')->user();
         abort_if($order->customer_id !== $customer->id, 403);
@@ -28,7 +29,7 @@ class OrderController extends Controller
         return view('storefront.account.order-detail', compact('order'));
     }
 
-    public function invoice(\App\Models\Order $order)
+    public function invoice(Order $order)
     {
         $customer = Auth::guard('customer')->user();
         abort_if($order->customer_id !== $customer->id, 403);
@@ -38,7 +39,7 @@ class OrderController extends Controller
         return view('orders.invoice', compact('order'));
     }
 
-    public function reorder(\App\Models\Order $order, CartService $cartService)
+    public function reorder(Order $order, CartService $cartService)
     {
         $customer = Auth::guard('customer')->user();
         abort_if($order->customer_id !== $customer->id, 403);

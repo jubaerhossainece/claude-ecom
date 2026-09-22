@@ -28,7 +28,7 @@ class ReturnRequestController extends Controller
 
         $data = $request->validate([
             'type' => 'required|in:return,exchange',
-            'reason' => 'required|in:' . implode(',', array_keys(ReturnRequest::REASONS)),
+            'reason' => 'required|in:'.implode(',', array_keys(ReturnRequest::REASONS)),
             'description' => 'nullable|string|max:2000',
             'photos.*' => 'nullable|image|max:5120',
         ]);

@@ -15,8 +15,11 @@ use Filament\Tables\Table;
 class ReturnRequestResource extends Resource
 {
     protected static ?string $model = ReturnRequest::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-arrow-uturn-left';
+
     protected static ?string $navigationGroup = 'Sales';
+
     protected static ?int $navigationSort = 2;
 
     public static function canCreate(): bool

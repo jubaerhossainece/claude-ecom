@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\BrandResource\RelationManagers;
 
 use App\Filament\Resources\ProductResource;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -11,7 +12,7 @@ class ProductsRelationManager extends RelationManager
 {
     protected static string $relationship = 'products';
 
-    public function form(\Filament\Forms\Form $form): \Filament\Forms\Form
+    public function form(Form $form): Form
     {
         return $form->schema([]);
     }

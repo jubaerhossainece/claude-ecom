@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Division;
+use App\Models\Order;
 use App\Models\Store;
 use App\Services\CartService;
 use App\Services\OrderService;
@@ -49,7 +50,7 @@ class CheckoutController extends Controller
             'thana_id' => 'required|exists:thanas,id',
             'area' => 'nullable|string|max:255',
             'address_line' => 'required|string|max:500',
-            'payment_method' => 'required|in:' . implode(',', array_keys($enabledPayments)),
+            'payment_method' => 'required|in:'.implode(',', array_keys($enabledPayments)),
             'notes' => 'nullable|string|max:500',
         ]);
 
@@ -69,7 +70,7 @@ class CheckoutController extends Controller
         return redirect()->route('checkout.success', $order)->with('order_placed', true);
     }
 
-    public function success(\App\Models\Order $order)
+    public function success(Order $order)
     {
         $store = Store::current();
         $codMessage = $store->getSetting('cod_confirmation_message');

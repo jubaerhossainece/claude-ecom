@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
+use App\Models\SearchQuery;
 use App\Models\Store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,7 +25,7 @@ class ProductController extends Controller
         // Attribute filters
         $filterableAttributes = $category->attributes()->where('is_filterable', true)->get();
         foreach ($filterableAttributes as $attr) {
-            if ($value = $request->get('attr_' . $attr->slug)) {
+            if ($value = $request->get('attr_'.$attr->slug)) {
                 $query->whereHas('attributeValues', function ($q) use ($attr, $value) {
                     $q->where('attribute_id', $attr->id)->where('value', $value);
                 });
@@ -107,12 +108,12 @@ class ProductController extends Controller
                 'price_asc' => $query->orderBy('base_price'),
                 'price_desc' => $query->orderByDesc('base_price'),
                 'newest' => $query->latest(),
-                default => $query->orderByRaw('FIELD(id, ' . ($ids->isNotEmpty() ? $ids->implode(',') : '0') . ')'),
+                default => $query->orderByRaw('FIELD(id, '.($ids->isNotEmpty() ? $ids->implode(',') : '0').')'),
             };
 
             $products = $query->paginate(24)->withQueryString();
 
-            \App\Models\SearchQuery::create([
+            SearchQuery::create([
                 'store_id' => $store->id,
                 'customer_id' => auth('customer')->id(),
                 'session_id' => $request->session()->getId(),
@@ -121,10 +122,10 @@ class ProductController extends Controller
             ]);
         }
 
-        $categories = \App\Models\Category::where('store_id', $store->id)->active()->orderBy('name')->get();
+        $categories = Category::where('store_id', $store->id)->active()->orderBy('name')->get();
         $sort = $request->get('sort', 'relevance');
 
-        $popularSearches = \App\Models\SearchQuery::where('store_id', $store->id)
+        $popularSearches = SearchQuery::where('store_id', $store->id)
             ->where('created_at', '>=', now()->subDays(30))
             ->selectRaw('query, COUNT(*) as searches')
             ->groupBy('query')

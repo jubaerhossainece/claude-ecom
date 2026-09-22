@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -57,7 +58,7 @@ class Category extends Model implements HasMedia
         $this->addMediaCollection('banner')->singleFile();
     }
 
-    public function getAncestors(): \Illuminate\Support\Collection
+    public function getAncestors(): Collection
     {
         $ancestors = collect();
         $category = $this;
@@ -65,6 +66,7 @@ class Category extends Model implements HasMedia
             $category = $category->parent;
             $ancestors->prepend($category);
         }
+
         return $ancestors;
     }
 

@@ -66,7 +66,7 @@ return new class extends Migration
                 continue;
             }
 
-            $cacheKey = $product->store_id . '|' . $name;
+            $cacheKey = $product->store_id.'|'.$name;
 
             if (! isset($brandIdByName[$cacheKey])) {
                 $slug = Str::slug($name);
